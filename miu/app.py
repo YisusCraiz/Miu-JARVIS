@@ -1,11 +1,15 @@
 import asyncio
 import secrets
 from contextlib import asynccontextmanager
+from importlib.util import find_spec
+from pathlib import Path
 from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
 from miu.config import Settings
@@ -49,6 +53,27 @@ def create_app(settings: Settings | None = None, provider=None):
     app = FastAPI(title="Miu-JARVIS", version="0.1.0", lifespan=lifespan)
     bearer = HTTPBearer(auto_error=False)
 
+    @app.middleware("http")
+    async def browser_headers(request, call_next):
+        response = await call_next(request)
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        if request.url.path == "/" or request.url.path.startswith("/static/"):
+            response.headers["Content-Security-Policy"] = (
+                "default-src 'self'; script-src 'self'; style-src 'self'; "
+                "connect-src 'self'; img-src 'self'; object-src 'none'; "
+                "base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
+            )
+        return response
+
+    web = Path(__file__).parent / "web"
+    app.mount("/static", StaticFiles(directory=web), name="static")
+
+    @app.get("/", include_in_schema=False)
+    def index():
+        return FileResponse(web / "index.html")
+
     def authorize(credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)]):
         if credentials is None or not secrets.compare_digest(
                 credentials.credentials.encode(), s.api_token.get_secret_value().encode()):
@@ -57,6 +82,17 @@ def create_app(settings: Settings | None = None, provider=None):
     @app.get("/health")
     def health():
         return {"status": "ok", "version": "0.1.0"}
+
+    @app.get("/v1/settings", dependencies=[Depends(authorize)])
+    def public_settings():
+        return {"local_model": s.local_model, "cloud_model": s.cloud_model,
+                "cloud_available": bool(s.cloud_api_key.get_secret_value())
+                and find_spec("litellm") is not None,
+                "history_messages": s.history_messages}
+
+    @app.get("/v1/sessions", dependencies=[Depends(authorize)])
+    def sessions():
+        return {"sessions": app.state.memory.sessions()}
 
     @app.post("/v1/chat", response_model=ChatResponse, dependencies=[Depends(authorize)])
     async def chat(request: ChatRequest):

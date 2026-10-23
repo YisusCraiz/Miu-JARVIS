@@ -1,5 +1,22 @@
 # Validación de la entrega
 
+## Incremento de interfaz web
+
+- 13 pruebas pasan en Windows/Python 3.12; Ruff sin errores.
+- Verificados endpoints de configuración sin secretos, autenticación, lista y
+  orden de conversaciones, eliminación, archivos estáticos y cabeceras de navegador.
+- Prueba de navegador con proveedor simulado y base separada: conexión con token
+  desechable, envío/respuesta, nueva conversación y recuperación de historial.
+  Etiquetas HTML de un mensaje aparecen como texto literal.
+- Interfaz inspeccionada en el panel estrecho del navegador; diseño adaptable sin
+  dependencias externas. No se ha probado en un teléfono físico.
+- La primera base temporal del preview tuvo permisos incompatibles con el sandbox;
+  se usó una base de prueba separada en `data/`. No se modificó memoria del usuario.
+- Pendiente prueba con Ollama real en el equipo del usuario. El aviso de deprecación
+  del cliente HTTPX de Starlette continúa; no hay fallos de pruebas asociados.
+
+## Fase 1
+
 Comprobado en Windows con Python 3.12.14:
 
 - Instalación editable del núcleo y extras de desarrollo completada.
