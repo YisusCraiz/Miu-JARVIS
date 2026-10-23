@@ -127,6 +127,7 @@ def test_web_assets_and_security_headers(setup):
     assert "script-src 'self'" in page.headers['content-security-policy']
     assert page.headers['cache-control'] == 'no-store'
     assert c.get('/static/app.js').status_code == 200
+    assert c.get('/static/voice.js').status_code == 200
     assert c.get('/static/style.css').status_code == 200
     assert c.get('/static/../config.py').status_code == 404
 

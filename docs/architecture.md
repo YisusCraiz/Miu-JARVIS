@@ -21,6 +21,13 @@ generar locks por plataforma, SBOM y revisión de vulnerabilidades.
 
 ## Fase 2 — cliente y voz
 
+Incremento de voz: adaptador cliente `MiuVoice` con APIs inyectables, dictado de una
+frase a borrador y TTS con voces locales identificadas por el navegador. Sin audio
+en backend ni cambio de contrato de chat. Se cancela la captura al ocultar página,
+desconectar o agotar 60 segundos. Los callbacks de capturas canceladas se ignoran.
+No equivale a STT offline; la captura puede depender de servicios del navegador.
+Próximo incremento: STT/TTS propios si se requiere independencia del navegador.
+
 Entregado el primer cliente web servido por FastAPI: conexión con token en memoria,
 selector de proveedor, consentimiento por pregunta, lista de las 100 conversaciones
 más recientes, contexto reciente y borrado con confirmación. Los modelos y claves
