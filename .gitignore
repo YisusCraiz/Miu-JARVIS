@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.installer-test-tmp/
+.ruff_cache/
+.env
+.env.*
+!.env.example
+data/
+*.db
+*.db-shm
+*.db-wal
