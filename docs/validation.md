@@ -1,5 +1,18 @@
 # Validación de la entrega
 
+## Incremento de voz del navegador
+
+- 13 pruebas Python y 8 pruebas JavaScript pasan; Ruff y sintaxis JS sin errores.
+- Dobles de APIs de voz: dictado a texto, fin de frase, rechazo de permiso,
+  cancelación, límite temporal, callbacks tardíos ignorados, navegador incompatible,
+  bloqueo de voces remotas y de lectura durante captura, límite de reproducción.
+- No se capturó audio real ni se ejercitó un servicio remoto de reconocimiento.
+  La calidad de transcripción, permisos, dispositivos, disponibilidad de voces y
+  reproducción real deben probarse en el navegador del usuario.
+- Navegador: conexión y chat con proveedor simulado, panel de voz, detección de voces
+  Microsoft locales, botón de lectura habilitado tras respuesta y transición de
+  iniciar/detener lectura comprobados. Esto no verifica la salida audible del equipo.
+
 ## Incremento de interfaz web
 
 - 13 pruebas pasan en Windows/Python 3.12; Ruff sin errores.

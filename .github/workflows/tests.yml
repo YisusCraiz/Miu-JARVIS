@@ -17,3 +17,8 @@ jobs:
       - run: python -m pip install -e ".[dev]"
       - run: python -m ruff check .
       - run: python -m pytest -q
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --check miu/web/app.js
+      - run: node --test tests/voice.test.cjs

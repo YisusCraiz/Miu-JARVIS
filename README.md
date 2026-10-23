@@ -3,7 +3,7 @@
 Núcleo Python/FastAPI para un asistente híbrido Windows/Android. Incluye chat con
 Ollama local, adaptador opcional LiteLLM para nube, historial SQLite por sesión,
 autenticación, chat web e historial. Todavía no incluye interfaz nativa de escritorio,
-APK, voz, avatar ni ejecución de acciones en tu equipo.
+APK, avatar ni ejecución de acciones en tu equipo. La voz del navegador es opcional.
 
 ## Windows: empezar
 
@@ -12,7 +12,7 @@ Clona este repositorio y selecciona la rama del PR antes de fusionarlo:
 ```powershell
 git clone https://github.com/YisusCraiz/Miu-JARVIS.git
 cd Miu-JARVIS
-git switch feat/chat-interface
+git switch feat/browser-voice
 powershell -ExecutionPolicy Bypass -File scripts/install.ps1 -InstallPython -InstallOllama
 ```
 
@@ -72,6 +72,44 @@ local no instala ni importa LiteLLM. No uses versiones flotantes o imágenes `la
 para esa integración. El SDK real y los proveedores deben validarse en un entorno
 aislado antes de habilitar claves de producción; las pruebas de nube usan un doble.
 
+## Hablar y escuchar a Miu
+
+Abre **Voz y micrófono** en el chat. El dictado está desactivado hasta que aceptes
+el aviso de tratamiento de audio. Selecciona idioma y pulsa **Hablar**; concede el
+permiso del navegador. Pulsa **Terminar dictado** o termina la frase. Revisa o edita
+la transcripción en el cuadro de mensaje y pulsa **Enviar**. Nunca se envía
+automáticamente al modelo. Se conserva cualquier borrador previo y se respeta el
+límite de 8000 caracteres. No hay escucha continua ni palabra de activación.
+
+El reconocimiento usa SpeechRecognition/webkitSpeechRecognition y tiene soporte
+limitado. Puede transmitir audio al proveedor del navegador y requerir internet,
+**incluso con Ollama local**. La autorización de nube del chat no controla ese
+servicio de dictado. Miu no graba archivos de audio ni los almacena en SQLite.
+El indicador muestra cuándo está activo; se cancela a los 60 segundos, al ocultar
+la página o al desconectar. Si deniegas permiso o no hay soporte, puedes escribir.
+Usa localhost o HTTPS; una IP de red por HTTP puede impedir el acceso al micrófono.
+
+Para escuchar, selecciona una **voz del dispositivo** y usa **Leer última respuesta**
+o activa **Leer respuestas nuevas automáticamente** (desactivado por defecto).
+Solo se muestran voces con `localService=true`, según informa el navegador: no se
+elige una voz remota como respaldo. Si no aparece ninguna, instala voces desde los
+ajustes de idioma del sistema y vuelve a abrir el navegador. Puedes elegir velocidad
+y pulsar **Detener voz**. Cada reproducción lee hasta 4000 caracteres; el texto
+completo permanece en el chat. La reproducción automática puede estar restringida
+por el navegador; el botón manual sigue disponible. No se reproduce historial al
+cargar una conversación. Cambiar conversación, desconectar o activar micrófono
+detiene la lectura. Las preferencias no se guardan al recargar.
+
+Micrófono y altavoces se seleccionan en los ajustes del navegador/sistema, no en
+Miu; esta API no permite elegir dispositivos desde el chat. En Codespaces el audio
+corresponde al navegador de tu computadora, no al servidor remoto. Para dictado
+plenamente local se necesita una futura integración STT propia (p. ej. Whisper).
+
+Prueba manual: dictar una frase, editarla y enviarla; reproducir/detener respuesta;
+probar permiso denegado y seguir escribiendo. Referencias:
+[SpeechRecognition](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition)
+y [voces locales](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisVoice/localService).
+
 ## Codespaces / Linux
 
 En GitHub elige esta rama → **Code → Codespaces → Create codespace**. El devcontainer
@@ -100,9 +138,11 @@ avatar nativo, drivers GPU y captura del escritorio se validarán en Windows/And
 ```powershell
 .venv\Scripts\python -m pytest -q
 .venv\Scripts\python -m ruff check .
+node --test tests/voice.test.cjs
 ```
 
-En Linux usa `.venv/bin/python`. CI cubre Windows/Linux y Python 3.11–3.13.
+En Linux usa `.venv/bin/python`. Node 24 solo se necesita para las pruebas JavaScript
+de desarrollo; no para instalar o ejecutar Miu. CI cubre Windows/Linux y Python 3.11–3.13.
 Las pruebas no descargan modelos, usan claves reales ni cobran servicios.
 
 El token debe tener al menos 32 caracteres; la API rechaza arrancar sin él.

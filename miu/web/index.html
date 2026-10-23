@@ -6,6 +6,7 @@
   <meta name="color-scheme" content="dark">
   <title>Miu · Tu espacio de conversación</title>
   <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/voice.js" defer></script>
   <script src="/static/app.js" defer></script>
 </head>
 <body>
@@ -26,8 +27,17 @@
     <section class="workspace" aria-label="Chat">
       <div class="chat-toolbar"><div class="provider-control"><label for="provider">Conversar con</label><select id="provider" disabled><option value="ollama">Ollama · Local</option><option value="cloud">Nube</option></select><span id="model" class="muted">Sin conexión</span></div><button id="delete-chat" class="quiet danger" disabled>Borrar conversación</button></div>
       <div id="cloud-notice" class="notice" hidden>La nube recibe tu mensaje y el contexto reciente de esta conversación. Puede generar cargos.<label><input id="consent" type="checkbox"> Autorizo el envío de mi próxima pregunta y su contexto.</label></div>
+      <details class="voice-settings">
+        <summary>Voz y micrófono</summary>
+        <p>El dictado del navegador puede enviar audio a su proveedor, incluso al conversar con Ollama local. No garantiza funcionamiento sin internet. Miu recibe solo el texto cuando pulses Enviar.</p>
+        <label class="voice-permission"><input id="dictation-consent" type="checkbox"> Entiendo y habilito el dictado del navegador para esta página.</label>
+        <div class="voice-options"><label>Idioma de dictado<select id="speech-language"><option value="es-MX">Español (México)</option><option value="es-ES">Español (España)</option><option value="en-US">English (US)</option></select></label><label>Voz del dispositivo<select id="speech-voice"><option value="">Buscando voces locales…</option></select></label><label>Velocidad<select id="speech-rate"><option value="0.8">Lenta</option><option value="1" selected>Normal</option><option value="1.2">Rápida</option></select></label></div>
+        <label class="voice-permission"><input id="read-aloud" type="checkbox"> Leer respuestas nuevas automáticamente (voz local).</label>
+        <p id="voice-capabilities"></p>
+      </details>
       <div id="messages" role="log" aria-label="Mensajes" aria-live="polite"><div class="welcome"><div class="orb" aria-hidden="true">m</div><span class="eyebrow">HOLA, SOY MIU</span><h2>¿Qué tienes en mente?</h2><p>Una idea por explorar, algo que resolver<br>o simplemente una conversación.</p><div class="suggestions"><button disabled>Ayúdame a organizar mi día</button><button disabled>Exploremos una idea</button></div></div></div>
       <p id="status" role="status" aria-live="polite">Conecta con tu token para empezar.</p>
+      <div class="voice-actions"><button id="dictate" type="button" disabled aria-pressed="false">Hablar</button><button id="read-last" type="button" disabled>Leer última respuesta</button><button id="stop-speech" type="button" disabled>Detener voz</button><span id="voice-status" role="status" aria-live="polite"></span></div>
       <form id="chat-form"><label class="sr-only" for="message">Tu mensaje</label><div class="composer"><textarea id="message" rows="2" maxlength="8000" placeholder="Escribe a Miu…" disabled required></textarea><button id="send" class="primary" disabled>Enviar ↗</button></div><p class="composer-note">Enter para enviar · Mayús + Enter para nueva línea · Miu puede equivocarse.</p></form>
     </section>
   </main>
