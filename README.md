@@ -1,8 +1,8 @@
-# Miu-JARVIS — fase 1
+# Miu-JARVIS — núcleo y chat web
 
 Núcleo Python/FastAPI para un asistente híbrido Windows/Android. Incluye chat con
 Ollama local, adaptador opcional LiteLLM para nube, historial SQLite por sesión,
-autenticación y borrado de historial. Todavía no incluye interfaz de escritorio,
+autenticación, chat web e historial. Todavía no incluye interfaz nativa de escritorio,
 APK, voz, avatar ni ejecución de acciones en tu equipo.
 
 ## Windows: empezar
@@ -12,7 +12,7 @@ Clona este repositorio y selecciona la rama del PR antes de fusionarlo:
 ```powershell
 git clone https://github.com/YisusCraiz/Miu-JARVIS.git
 cd Miu-JARVIS
-git switch feat/phase1-core
+git switch feat/chat-interface
 powershell -ExecutionPolicy Bypass -File scripts/install.ps1 -InstallPython -InstallOllama
 ```
 
@@ -33,7 +33,16 @@ powershell -ExecutionPolicy Bypass -File scripts/start.ps1
 
 El modelo es un ejemplo pequeño; la velocidad depende de RAM/VRAM/CPU. Revisa la
 licencia del modelo elegido antes de redistribuirlo. Cambia `MIU_LOCAL_MODEL` si
-usas otro. La API escucha en `127.0.0.1:8000`; abre
+usas otro. Abre [Miu](http://127.0.0.1:8000) e introduce el valor de
+`MIU_API_TOKEN` de tu `.env`. Podrás crear conversaciones, retomarlas desde la lista,
+cambiar local/nube y borrar el historial con confirmación. El token solo vive en
+memoria de la página: al recargar debes introducirlo de nuevo; no se guarda en
+cookies ni almacenamiento del navegador. Las conversaciones permanecen en SQLite.
+La nube se habilita cuando hay clave y SDK en el servidor y pide consentimiento
+para cada pregunta. Los modelos se muestran en la interfaz y se cambian en `.env`
+reiniciando el servidor; las claves de proveedor no se muestran ni editan en el chat.
+
+La API escucha en `127.0.0.1:8000`; también puedes abrir
 [Swagger](http://127.0.0.1:8000/docs), pulsa **Authorize** e introduce el valor de
 `MIU_API_TOKEN` de tu `.env`. Usa un UUID nuevo como `session_id`, por ejemplo con
 `[guid]::NewGuid().ToString()`.
@@ -72,7 +81,8 @@ instala Python y prepara entorno/token/pruebas. Después:
 .venv/bin/python -m uvicorn miu.app:create_app --factory --host 0.0.0.0 --port 8000
 ```
 
-Mantén el puerto reenviado **privado**. Abre su URL `/docs` y autoriza con el token.
+Mantén el puerto reenviado **privado**. Abre su URL raíz para usar el chat e introduce
+tu token. `/docs` sigue disponible para explorar la API.
 Para nube instala `.[cloud]` dentro de `.venv` y configura las variables mediante
 Codespaces Secrets o `.env` (las variables del entorno tienen prioridad).
 Para local debes instalar Ollama **dentro del Codespace** y descargar un modelo;

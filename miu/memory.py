@@ -40,3 +40,12 @@ class Memory:
     def delete(self, session: str):
         with self.connection() as db:
             db.execute("DELETE FROM messages WHERE session=?", (session,))
+
+    def sessions(self):
+        with self.connection() as db:
+            rows = db.execute("""SELECT session,
+                (SELECT substr(content,1,60) FROM messages AS first
+                 WHERE first.session=m.session AND first.role='user' ORDER BY id LIMIT 1),
+                max(id) AS latest FROM messages AS m GROUP BY session
+                ORDER BY latest DESC LIMIT 100""").fetchall()
+        return [{"id": session, "title": title or "Conversación"} for session, title, _ in rows]

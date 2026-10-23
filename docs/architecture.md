@@ -21,6 +21,12 @@ generar locks por plataforma, SBOM y revisión de vulnerabilidades.
 
 ## Fase 2 — cliente y voz
 
+Entregado el primer cliente web servido por FastAPI: conexión con token en memoria,
+selector de proveedor, consentimiento por pregunta, lista de las 100 conversaciones
+más recientes, contexto reciente y borrado con confirmación. Los modelos y claves
+siguen configurándose en `.env` del servidor; no se editan desde el navegador.
+No usa recursos externos ni añade una cadena de compilación JavaScript.
+
 Cliente web compartido, pantalla de configuración y selector local/nube; streaming,
 cancelación, STT/TTS con contratos independientes. Autorización explícita al usar
 micrófono, estado visible y pruebas reales de latencia. Probar primero Windows.

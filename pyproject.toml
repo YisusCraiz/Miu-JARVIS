@@ -16,6 +16,9 @@ dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
 [tool.setuptools.packages.find]
 include = ["miu*"]
 
+[tool.setuptools.package-data]
+miu = ["web/*.html", "web/*.css", "web/*.js"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 

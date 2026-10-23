@@ -117,3 +117,33 @@ def test_sql_values_are_not_executable(tmp_path):
     text = "'); DROP TABLE messages;--"
     m.save_turn('session', text, 'ok')
     assert m.history('session', 2)[0]['content'] == text
+
+
+def test_web_assets_and_security_headers(setup):
+    c, _, _ = setup
+    page = c.get('/')
+    assert page.status_code == 200
+    assert 'Conversa con Miu' in page.text
+    assert "script-src 'self'" in page.headers['content-security-policy']
+    assert page.headers['cache-control'] == 'no-store'
+    assert c.get('/static/app.js').status_code == 200
+    assert c.get('/static/style.css').status_code == 200
+    assert c.get('/static/../config.py').status_code == 404
+
+
+def test_session_list_and_public_settings(setup):
+    c, _, _ = setup
+    assert c.get('/v1/sessions').status_code == 401
+    assert c.get('/v1/settings').status_code == 401
+    assert c.get('/v1/sessions', headers=AUTH).json() == {'sessions': []}
+    config = c.get('/v1/settings', headers=AUTH)
+    assert config.status_code == 200
+    assert set(config.json()) == {'local_model', 'cloud_model', 'cloud_available', 'history_messages'}
+    assert TOKEN not in config.text
+    first, second = str(uuid4()), str(uuid4())
+    for session, text in [(first, '<script>alert(1)</script>'), (second, 'Otra charla')]:
+        c.post('/v1/chat', headers=AUTH, json={'session_id': session, 'message': text})
+    items = c.get('/v1/sessions', headers=AUTH).json()['sessions']
+    assert [s['id'] for s in items] == [second, first]
+    c.delete(f'/v1/sessions/{second}', headers=AUTH)
+    assert len(c.get('/v1/sessions', headers=AUTH).json()['sessions']) == 1
